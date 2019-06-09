@@ -13,6 +13,13 @@
 <a name="Hardware"></a>
 ## Hardware
 
+| Item | Discription | Ali link (short) | Price |
+|------|-------------|------------------|------:|
+|      |             |                  |       |
+|      |             |                  |       |
+|      |             |                  |       |
+
+
 <a name="SettingUp"></a>
 ## Setting up everything
 This project should be maintained in the VS Code + PlatformIDE environment. Simply import this project in VS Code, and all the dependencies (compilers etc) should be downloaded automatically. Use the documentation in the folders to include for example libaries etc.
