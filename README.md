@@ -23,7 +23,7 @@
 | E-INK screen    | 1.54", 200x200                                                                                    | https://bit.ly/2MR1vm3 |  $10.22 |
 | BME280          | Temperature, Humidity, pressure                                                                   | https://bit.ly/2XzHNvL |   $2.21 |
 | LED strip       | 8 LED Strip ws2812                                                                                | https://bit.ly/2MBBCX8 |   $0.72 |
-| Battery         | 800mAh, 3.7v, TODO: find connector that matches ESP32                                                                                      | https://bit.ly/2ZaxiPU |   $2.30 |
+| Battery         | 800mAh, 3.7v, TODO: find connector that matches ESP32                                             | https://bit.ly/2ZaxiPU |   $2.30 |
 
 
 <a name="SettingUp"></a>
