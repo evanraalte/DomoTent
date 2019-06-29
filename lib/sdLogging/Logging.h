@@ -6,8 +6,10 @@
 class Logging {
 private:
   File logFile;
+  char fileName[100];
   
 public:
-  int init(char *fileName,char *options);
-  int appendLine(char *line);
+  int init(const char *fileNameInit);
+
+  int appendfile(const char *line);
 };
