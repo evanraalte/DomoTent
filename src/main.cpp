@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include <Logging.h>
 
-Logging logging;
+Logging logger;
 
 void setup() {
-  logging.init("helloWorld.txt");
+  logger.init("helloWorld.txt");
   // put your setup code here, to run once:
 }
 

@@ -2,3 +2,4 @@
 .pioenvs
 .vscode/*
 
+.vscode/settings.json
