@@ -24,6 +24,7 @@
 | LED strip       | 8 LED Strip ws2812                                    | https://bit.ly/2MBBCX8 |   $0.72 | 1 pin | Any IO              |
 | Battery         | 1500mAh, 3.7v, no connector                           | https://bit.ly/2F74osi |   €2.75 | N/A   | Vbat                |
 | RF Module       | TZT NRF24L01, 2,4GHz, 2Mbit/s                         | https://bit.ly/2RFaYva |   €0.71 | N/A   |                     |
+
 [Reference for pin mapping](https://github.com/espressif/arduino-esp32#esp32dev-board-pinmap)
 
 <a name="SettingUp"></a>
