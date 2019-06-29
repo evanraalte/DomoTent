@@ -23,7 +23,6 @@
 | BME280          | Temperature, Humidity, pressure                       | https://bit.ly/2XzHNvL |   $2.21 | I2C   | GP21-22 (HW I2C)    |
 | LED strip       | 8 LED Strip ws2812                                    | https://bit.ly/2MBBCX8 |   $0.72 | 1 pin | Any IO              |
 | Battery         | 1500mAh, 3.7v, no connector                           | https://bit.ly/2F74osi |   €2.75 | N/A   | Vbat                |
-|-----------------|-------------------------------------------------------|------------------------|--------:|-------|---------------------|
 [Reference for pin mapping](https://github.com/espressif/arduino-esp32#esp32dev-board-pinmap)
 
 <a name="SettingUp"></a>
