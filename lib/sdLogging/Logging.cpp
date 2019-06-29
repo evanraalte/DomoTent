@@ -1,7 +1,10 @@
 #include "Logging.h"
 
 int Logging::init(const char *fileNameInit){
-    if(!SD.begin()){
+    SPIClass sdSPI(VSPI);
+    sdSPI.begin(SDCARD_CLK, SDCARD_MISO, SDCARD_MOSI, SDCARD_SS);
+
+    if(!SD.begin(SDCARD_SS,sdSPI)){
         Serial.println("Card Mount Failed");
         return 1;
     }
