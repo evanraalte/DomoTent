@@ -1,6 +1,7 @@
+<<<<<<< HEAD
 .pio
 .pioenvs
 .piolibdeps
 .vscode/*
-.vscode/ipch/a1a73df70a8f46ba/MAIN.ipch
-.vscode/ipch/a1a73df70a8f46ba/mmap_address.bin
+.vscode/ipch/*
+>>>>>>> 95498ec65b6f0ac12d18d4919464d438e0418e43

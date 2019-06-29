@@ -2,5 +2,9 @@
     "terminal.integrated.env.windows": {
         "PATH": "C:\\Users\\erikv\\.platformio\\penv\\Scripts;C:\\Users\\erikv\\.platformio\\penv;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Windows\\System32\\OpenSSH\\;C:\\Program Files\\Git\\cmd;C:\\Users\\erikv\\AppData\\Local\\Microsoft\\WindowsApps;;C:\\Users\\erikv\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\erikv\\AppData\\Local\\Programs\\Microsoft VS Code Insiders\\bin;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Windows\\System32\\OpenSSH\\;C:\\Program Files\\Git\\cmd;C:\\Users\\erikv\\AppData\\Local\\Microsoft\\WindowsApps;;C:\\Users\\erikv\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\erikv\\AppData\\Local\\Programs\\Microsoft VS Code Insiders\\bin",
         "PLATFORMIO_CALLER": "vscode"
+    },
+    "terminal.integrated.env.linux": {
+        "PATH": "/home/erikvr/.platformio/penv/bin:/home/erikvr/.platformio/penv:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl",
+        "PLATFORMIO_CALLER": "vscode"
     }
 }
