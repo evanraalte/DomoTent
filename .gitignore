@@ -2,3 +2,5 @@
 .pioenvs
 .piolibdeps
 .vscode/*
+.vscode/ipch/a1a73df70a8f46ba/MAIN.ipch
+.vscode/ipch/a1a73df70a8f46ba/mmap_address.bin
