@@ -5,7 +5,8 @@
 
 class Logging {
 private:
-
+  File logFile;
+  
 public:
   int init(char *fileName,char *options);
   int appendLine(char *line);
