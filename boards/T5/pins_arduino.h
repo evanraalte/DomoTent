@@ -16,6 +16,9 @@
 //#include <GxGDE0213B1/GxGDE0213B1.h>      // 2.13" b/w
 // #include <GxGDEW0213Z16/GxGDEW0213Z16.h>  // 2.13" b/w/r
 
+#define SDA 21
+#define SCL 22
+
 //Some arduino libs require standard SPI defs, even if you do not use them
 #define SS -1
 #define MOSI -1
