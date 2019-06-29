@@ -1,4 +1,4 @@
 .pio
 .pioenvs
-.vscode/**
-.vscode/settings.json
+.vscode/*
+
