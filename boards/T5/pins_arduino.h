@@ -15,6 +15,14 @@
 //#include <GxGDEW029Z10/GxGDEW029Z10.h>    // 2.9" b/w/r
 //#include <GxGDE0213B1/GxGDE0213B1.h>      // 2.13" b/w
 // #include <GxGDEW0213Z16/GxGDEW0213Z16.h>  // 2.13" b/w/r
+
+//Some arduino libs require standard SPI defs, even if you do not use them
+#define SS -1
+#define MOSI -1
+#define MISO -1
+#define SCK -1
+
+
 #define ELINK_BUSY 4
 #define ELINK_RESET 16
 #define ELINK_DC 17
