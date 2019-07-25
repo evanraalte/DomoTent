@@ -4,3 +4,4 @@
 .vscode/ipch/*
 .vscode/settings.json
 .pioenvs/**
+.pio/build/structure.hash
