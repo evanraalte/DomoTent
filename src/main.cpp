@@ -4,7 +4,6 @@
 #include <GxIO/GxIO_SPI/GxIO_SPI.h>
 #include <GxIO/GxIO.h>
 #include <GxGDEH0213B72/GxGDEH0213B72.h> 
-#include <ArduinoJson.h>
 
 #include <Fonts/FreeMono9pt7b.h>
 #include <Fonts/FreeMonoBoldOblique9pt7b.h>
