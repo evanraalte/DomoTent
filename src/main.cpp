@@ -108,7 +108,7 @@ void displayInit(void)
     }
     isInit = true;
     display.init();
-    //display.setRotation(1);
+    display.setRotation(1);
     display.eraseDisplay();
     display.setTextColor(GxEPD_BLACK);
     display.setFont(&DEFALUT_FONT);
@@ -346,14 +346,15 @@ void showMainPage(void)
 {
     displayInit();
     display.fillScreen(GxEPD_WHITE);;
-    //drawBitmap(DEFALUT_QR_CODE_BMP, 10, 10, false);
-    //displayText("Reee", 30, RIGHT_ALIGNMENT);
-    //displayText("eeee", 50, RIGHT_ALIGNMENT);
-    //displayText("eeee", 70, RIGHT_ALIGNMENT);
-    //displayText("eeee", 90, RIGHT_ALIGNMENT);
-    display.drawExampleBitmap(BitmapExample1, 0, 0, GxEPD_WIDTH, GxEPD_HEIGHT, GxEPD_BLACK);
+    drawBitmap(DEFALUT_QR_CODE_BMP, 10, 10, false);
+    displayText("Reee", 30, RIGHT_ALIGNMENT);
+    displayText("eeee", 50, RIGHT_ALIGNMENT);
+    displayText("eeee", 70, RIGHT_ALIGNMENT);
+    displayText("eeee", 90, RIGHT_ALIGNMENT);
+    // display.drawExampleBitmap(BitmapExample1, 0, 0, GxEPD_WIDTH, GxEPD_HEIGHT, GxEPD_BLACK);
+   
     display.update();
-    display.update();
+    // display.update();
 }
 
 
