@@ -1,10 +1,10 @@
 
 #define TTGO_T5_1_2 0
-#define TTGO_T5_2_0 0
+#define TTGO_T5_2_0 1
 #define TTGO_T5_2_1 0
 #define TTGO_T5_2_2 0
 #define TTGO_T5_2_3 0
-#define TTGO_T5_2_4 1
+#define TTGO_T5_2_4 0
 
 #if (TTGO_T5_1_2) || (TTGO_T5_2_4)
 //#include <GxGDEP015OC1/GxGDEP015OC1.h>    // 1.54" b/w
@@ -75,7 +75,7 @@
 #elif (TTGO_T5_2_0)||(TTGO_T5_2_3)
 // #include <GxGDE0213B1/GxGDE0213B1.h>      // 2.13" b/w
 // #include <GxGDE0213B72/GxGDE0213B72.h>      // 2.13" b/w
-#include <GxGDE0213B72B/GxGDE0213B72B.h>      // 2.13" b/w
+//#include <GxGDE0213B72B/GxGDE0213B72B.h>      // 2.13" b/w
 #define SPI_MOSI 23
 #define SPI_MISO -1
 #define SPI_CLK 18
@@ -85,6 +85,7 @@
 #define ELINK_RESET 16
 #define ELINK_DC  17
 
+#define NRF24_SS  12
 #define SDCARD_SS 13
 #define SDCARD_CLK 14
 #define SDCARD_MOSI 15
