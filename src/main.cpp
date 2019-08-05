@@ -90,8 +90,39 @@ enum State state = listen;
 
 int timeSeconds = 0;
 
+
+void buildSensorMessage(int temperature,int humidity, int opens, char str[]){
+  temperature = temperature % 999;
+  humidity = humidity % 999;
+  opens = opens % 999;
+
+  // char sTemperature[4];
+  // char sHumidity[4];
+  // char sOpens[4];
+
+  // itoa(temperature,sTemperature,10);
+  // itoa(humidity,sHumidity,10);
+  // itoa(opens,sOpens,10);
+
+  char cName;
+  #ifdef ERIK
+    cName = 'E';
+  #endif
+  #ifdef JOOST
+    cName = 'J';
+  #endif
+  #ifdef BEREND
+    cName = 'B';
+  #endif
+
+
+  sprintf(str,"S;%c;%03d;%03d;%03d;.",cName,temperature,humidity,opens);
+
+}
+
+
 void loop() {
-  timeSeconds = (timeSeconds + 1) % 60; // temporary work arround until RTC is implemented
+  timeSeconds = (timeSeconds + 1) % 60; // temporary workaround until RTC is implemented
   
 
   if(timeSeconds == STARTTIME){ //only start when it is exactly the right time
@@ -104,8 +135,9 @@ void loop() {
   if(state == sendSensor){
     radio.stopListening();
     //build message
-    char msg [32] = "derp";
-    radio.write(&msg, sizeof(msg));
+    char sendStr [32];
+    buildSensorMessage(200,300,400,sendStr);
+    radio.write(&sendStr, sizeof(sendStr));
     state = sendMessage;
   } else if(state == sendMessage ){
 
@@ -115,10 +147,20 @@ void loop() {
       delay(5);
       radio.startListening();
       state = listen;
+  } else if (state == listen){
+    if( radio.available()){
+      char receiveStr [32] = "";
+                                                              // Variable for the received timestamp
+      while (radio.available()) {                                   // While there is data ready
+        radio.read( &receiveStr, sizeof(receiveStr) );                            // Get the payload
+      }
+     
+      Serial.println(receiveStr);  
+   }
   }
 
 
-  
+  delay(1000);
 }
 
 
