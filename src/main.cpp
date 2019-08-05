@@ -73,8 +73,10 @@ boolean buttonState = 0;
 void setup() {
   pinMode(12, OUTPUT);
   radio.begin();
-  radio.openWritingPipe(writeAddr[0]);
-  radio.openWritingPipe(writeAddr[1]);
+  // radio.openWritingPipe(writeAddr[0]);
+  // radio.openWritingPipe(writeAddr[1]);
+
+
   radio.openReadingPipe(1, readAddr[0]);
   radio.openReadingPipe(2, readAddr[1]);
   radio.setPALevel(RF24_PA_MAX);
@@ -137,7 +139,13 @@ void loop() {
     //build message
     char sendStr [32];
     buildSensorMessage(200,300,400,sendStr);
+
+    radio.openWritingPipe(writeAddr[0]);
     radio.write(&sendStr, sizeof(sendStr));
+
+    radio.openWritingPipe(writeAddr[1]);
+    radio.write(&sendStr, sizeof(sendStr));
+
     state = sendMessage;
   } else if(state == sendMessage ){
 
@@ -156,6 +164,8 @@ void loop() {
       }
      
       Serial.println(receiveStr);  
+
+      //TODO: decoden etc, eerst maar eens zien of dit werkt
    }
   }
 
