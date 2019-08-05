@@ -6,6 +6,13 @@
 #define TTGO_T5_2_3 0
 #define TTGO_T5_2_4 0
 
+
+#define SCK 0
+#define MISO 0
+#define MOSI 0
+#define SS 0
+
+
 #if (TTGO_T5_1_2) || (TTGO_T5_2_4)
 //#include <GxGDEP015OC1/GxGDEP015OC1.h>    // 1.54" b/w
 // #include <GxGDEW0154Z04/GxGDEW0154Z04.h>  // 1./54" b/w/r 200x200
@@ -71,6 +78,11 @@
 
 #define BUTTONS_MAP {37,38,39}
 #define SPEAKER_OUT 25
+
+
+
+
+
 
 #elif (TTGO_T5_2_0)||(TTGO_T5_2_3)
 // #include <GxGDE0213B1/GxGDE0213B1.h>      // 2.13" b/w

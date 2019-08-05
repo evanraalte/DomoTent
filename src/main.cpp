@@ -1,63 +1,125 @@
-#include <Arduino.h>
-
-// rf24_server.pde
-// -*- mode: C++ -*-
-// Example sketch showing how to create a simple messageing server
-// with the RH_RF24 class. RH_RF24 class does not provide for addressing or
-// reliability, so you should only use RH_RF24  if you do not need the higher
-// level messaging abilities.
-// It is designed to work with the other example rf24_client
-// Tested on Anarduino Mini http://www.anarduino.com/mini/ with RFM24W and RFM26W
+/*
+* Arduino Wireless Communication Tutorial
+*     Example 2 - Transmitter Code
+*                
+* by Dejan Nedelkovski, www.HowToMechatronics.com
+* 
+* Library: TMRh20/RF24, https://github.com/tmrh20/RF24/
+*/
 
 #include <SPI.h>
-#include <RH_RF24.h>
+#include <nRF24L01.h>
+#include <RF24.h>
 
- 
 
-// Singleton instance of the radio driver
-RH_RF24 rf24;
 
-void setup() 
-{
-  SPIClass sdSPI(VSPI);
-  sdSPI.begin(SDCARD_CLK, SDCARD_MISO, SDCARD_MOSI, SDCARD_SS);
-  Serial.begin(115200);
-    Serial.println("Initting...");
-  if (!rf24.init())
-    Serial.println("init failed");
-  // The default radio config is for 30MHz Xtal, 434MHz base freq 2GFSK 5kbps 10kHz deviation
-  // power setting 0x10
-  // If you want a different frequency mand or modulation scheme, you must generate a new
-  // radio config file as per the RH_RF24 module documentation and recompile
-  // You can change a few other things programatically:
-  rf24.setFrequency(435.0); // Only within the same frequency band
-  //rf24.setTxPower(0x7f);
+
+#define led 12
+
+RF24 radio(7, 8); // CE, CSN
+
+
+#define ERIK
+// #define JOOST
+// #define BEREND
+
+
+
+#define ADDR_ERIK "00001"
+#define ADDR_JOOST "00002"
+#define ADDR_BEREND "00003"
+/*
+ * Erik   -> "00001"
+ * Joost  -> "00002"
+ * Berend -> "00003"
+ *
+ */
+
+
+
+
+#ifdef ERIK
+  const byte writeAddr[][6] = {ADDR_JOOST, ADDR_BEREND};
+  const byte readAddr[][6] = {ADDR_JOOST, ADDR_BEREND};
+
+  #define STARTTIME 0
+  #define ENDTIME 5
+#endif
+
+#ifdef JOOST
+  const byte writeAddr[][6] = {ADDR_ERIK, ADDR_BEREND};
+  const byte readAddr[][6] = {ADDR_ERIK, ADDR_BEREND};
+
+  #define STARTTIME 20
+  #define ENDTIME 25
+
+#endif
+
+#ifdef BEREND
+  const byte writeAddr[][6] = {ADDR_ERIK, ADDR_JOOST};
+  const byte readAddr[][6] = {ADDR_ERIK, ADDR_JOOST};
+
+  #define STARTTIME 40
+  #define ENDTIME 45
+#endif
+
+
+
+
+
+
+boolean buttonState = 0;
+
+void setup() {
+  pinMode(12, OUTPUT);
+  radio.begin();
+  radio.openWritingPipe(writeAddr[0]);
+  radio.openWritingPipe(writeAddr[1]);
+  radio.openReadingPipe(1, readAddr[0]);
+  radio.openReadingPipe(2, readAddr[1]);
+  radio.setPALevel(RF24_PA_MAX);
 }
 
-void loop()
-{
-  if (rf24.available())
-  {
-    // Should be a message for us now   
-    uint8_t buf[RH_RF24_MAX_MESSAGE_LEN];
-    uint8_t len = sizeof(buf);
-    if (rf24.recv(buf, &len))
-    {
-//      RF24::printBuffer("request: ", buf, len);
-      Serial.print("got request: ");
-      Serial.println((char*)buf);
-//      Serial.print("RSSI: ");
-//      Serial.println((uint8_t)rf24.lastRssi(), DEC);
-      
-      // Send a reply
-      uint8_t data[] = "And hello back to you";
-      rf24.send(data, sizeof(data));
-      rf24.waitPacketSent();
-      Serial.println("Sent a reply");
-    }
-    else
-    {
-      Serial.println("recv failed");
-    }
+
+
+
+
+enum State {listen, sendSensor, sendMessage};
+
+enum State state = listen; 
+
+int timeSeconds = 0;
+
+void loop() {
+  timeSeconds = (timeSeconds + 1) % 60; // temporary work arround until RTC is implemented
+  
+
+  if(timeSeconds == STARTTIME){ //only start when it is exactly the right time
+    state = sendSensor;
+  } else if(timeSeconds >= ENDTIME || timeSeconds < STARTTIME){
+    state = listen;
+    radio.startListening();
   }
+
+  if(state == sendSensor){
+    radio.stopListening();
+    //build message
+    char msg [32] = "derp";
+    radio.write(&msg, sizeof(msg));
+    state = sendMessage;
+  } else if(state == sendMessage ){
+
+      //build message
+      // char msg [32] = "derp";
+      // radio.write(&msg, sizeof(msg));
+      delay(5);
+      radio.startListening();
+      state = listen;
+  }
+
+
+  
 }
+
+
+
