@@ -6,17 +6,17 @@
 * 
 * Library: TMRh20/RF24, https://github.com/tmrh20/RF24/
 */
-
+#include <Arduino.h>
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-
+// #include <DigitalIO.h>
 
 
 
 #define led 12
 
-RF24 radio(7, 8); // CE, CSN
+RF24 radio(22,23); // CE, CSN
 
 
 #define ERIK
@@ -71,6 +71,9 @@ RF24 radio(7, 8); // CE, CSN
 boolean buttonState = 0;
 
 void setup() {
+
+  Serial.begin(115200);
+  Serial.printf("Starting app as %s",ADDR_ERIK);
   pinMode(12, OUTPUT);
   radio.begin();
   // radio.openWritingPipe(writeAddr[0]);
@@ -124,8 +127,8 @@ void buildSensorMessage(int temperature,int humidity, int opens, char str[]){
 
 
 void loop() {
-  timeSeconds = (timeSeconds + 1) % 60; // temporary workaround until RTC is implemented
   
+  Serial.printf("time: %d\n",timeSeconds);
 
   if(timeSeconds == STARTTIME){ //only start when it is exactly the right time
     state = sendSensor;
@@ -136,6 +139,7 @@ void loop() {
 
   if(state == sendSensor){
     radio.stopListening();
+    Serial.printf("Send sensors...\n");
     //build message
     char sendStr [32];
     buildSensorMessage(200,300,400,sendStr);
@@ -148,7 +152,7 @@ void loop() {
 
     state = sendMessage;
   } else if(state == sendMessage ){
-
+      Serial.printf("Send message...\n");
       //build message
       // char msg [32] = "derp";
       // radio.write(&msg, sizeof(msg));
@@ -156,20 +160,25 @@ void loop() {
       radio.startListening();
       state = listen;
   } else if (state == listen){
+
+    Serial.printf("listening...\n");
+
     if( radio.available()){
+
+
       char receiveStr [32] = "";
                                                               // Variable for the received timestamp
       while (radio.available()) {                                   // While there is data ready
         radio.read( &receiveStr, sizeof(receiveStr) );                            // Get the payload
       }
      
-      Serial.println(receiveStr);  
+      Serial.printf("Received a string: %s\n",receiveStr);  
 
       //TODO: decoden etc, eerst maar eens zien of dit werkt
    }
   }
 
-
+  timeSeconds = (timeSeconds + 1) % 60; // temporary workaround until RTC is implemented
   delay(1000);
 }
 
