@@ -12,179 +12,136 @@
 #include <RF24.h>
 // #include <DigitalIO.h>
 
-
-
 RF24 radio(SCK,MISO,MOSI,22,23); // CE, CSN
 
 
 
+bool radioNumber = 0;
 
-// #define ERIK
-#define JOOST
-// #define BEREND
+/* Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 */
+// RF24 radio(7,8);
+/**********************************************************/
 
+byte addresses[][6] = {"1Node","2Node"};
 
-
-#define ADDR_ERIK "00001"
-#define ADDR_JOOST "00002"
-#define ADDR_BEREND "00003"
-/*
- * Erik   -> "00001"
- * Joost  -> "00002"
- * Berend -> "00003"
- *
- */
-
-
-
-
-#ifdef ERIK
-  const byte writeAddr[][6] = {ADDR_JOOST, ADDR_BEREND};
-  const byte readAddr[][6] = {ADDR_JOOST, ADDR_BEREND};
-
-  #define STARTTIME 0
-  #define ENDTIME 5
-#endif
-
-#ifdef JOOST
-  const byte writeAddr[][6] = {ADDR_ERIK, ADDR_BEREND};
-  const byte readAddr[][6] = {ADDR_ERIK, ADDR_BEREND};
-
-  #define STARTTIME 20
-  #define ENDTIME 25
-
-#endif
-
-#ifdef BEREND
-  const byte writeAddr[][6] = {ADDR_ERIK, ADDR_JOOST};
-  const byte readAddr[][6] = {ADDR_ERIK, ADDR_JOOST};
-
-  #define STARTTIME 40
-  #define ENDTIME 45
-#endif
-
-
-
-
-
-
-boolean buttonState = 0;
+// Used to control whether this node is sending or receiving
+bool role = 0;
 
 void setup() {
-
   Serial.begin(115200);
-  Serial.printf("Starting app as %s",ADDR_ERIK);
-  pinMode(12, OUTPUT);
+  Serial.println(F("RF24/examples/GettingStarted"));
+  Serial.println(F("*** PRESS 'T' to begin transmitting to the other node"));
+  
   radio.begin();
-  // radio.openWritingPipe(writeAddr[0]);
-  // radio.openWritingPipe(writeAddr[1]);
 
-  radio.setChannel(2);
-  radio.setPayloadSize(32);
-
-  radio.setDataRate(RF24_250KBPS);
-  radio.setPALevel(RF24_PA_MAX);
-
-  radio.openReadingPipe(1, readAddr[0]);
-  radio.openReadingPipe(2, readAddr[1]);
+  // Set the PA Level low to prevent power supply related issues since this is a
+ // getting_started sketch, and the likelihood of close proximity of the devices. RF24_PA_MAX is default.
+  radio.setPALevel(RF24_PA_LOW);
+  
+  // Open a writing and reading pipe on each radio, with opposite addresses
+  if(radioNumber){
+    radio.openWritingPipe(addresses[1]);
+    radio.openReadingPipe(1,addresses[0]);
+  }else{
+    radio.openWritingPipe(addresses[0]);
+    radio.openReadingPipe(1,addresses[1]);
+  }
+  
+  // Start the radio listening for data
+  radio.startListening();
 }
-
-
-
-
-
-enum State {listen, sendSensor, sendMessage};
-
-enum State state = listen; 
-
-int timeSeconds = 0;
-
-
-void buildSensorMessage(int temperature,int humidity, int opens, char str[]){
-  temperature = temperature % 999;
-  humidity = humidity % 999;
-  opens = opens % 999;
-
-  // char sTemperature[4];
-  // char sHumidity[4];
-  // char sOpens[4];
-
-  // itoa(temperature,sTemperature,10);
-  // itoa(humidity,sHumidity,10);
-  // itoa(opens,sOpens,10);
-
-  char cName;
-  #ifdef ERIK
-    cName = 'E';
-  #endif
-  #ifdef JOOST
-    cName = 'J';
-  #endif
-  #ifdef BEREND
-    cName = 'B';
-  #endif
-
-
-  sprintf(str,"S;%c;%03d;%03d;%03d;.",cName,temperature,humidity,opens);
-
-}
-
 
 void loop() {
   
-  // Serial.printf("time: %d\n",timeSeconds);
+  
+/****************** Ping Out Role ***************************/  
+if (role == 1)  {
+    
+    radio.stopListening();                                    // First, stop listening so we can talk.
+    
+    
+    Serial.println(F("Now sending"));
 
-  if(timeSeconds == STARTTIME){ //only start when it is exactly the right time
-    state = sendSensor;
-  } else if(timeSeconds >= ENDTIME || timeSeconds < STARTTIME){
-    state = listen;
-    radio.startListening();
+    unsigned long start_time = micros();                             // Take the time, and send it.  This will block until complete
+     if (!radio.write( &start_time, sizeof(unsigned long) )){
+       Serial.println(F("failed"));
+     }
+        
+    radio.startListening();                                    // Now, continue listening
+    
+    unsigned long started_waiting_at = micros();               // Set up a timeout period, get the current microseconds
+    boolean timeout = false;                                   // Set up a variable to indicate if a response was received or not
+    
+    while ( ! radio.available() ){                             // While nothing is received
+      if (micros() - started_waiting_at > 200000 ){            // If waited longer than 200ms, indicate timeout and exit while loop
+          timeout = true;
+          break;
+      }      
+    }
+        
+    if ( timeout ){                                             // Describe the results
+        Serial.println(F("Failed, response timed out."));
+    }else{
+        unsigned long got_time;                                 // Grab the response, compare, and send to debugging spew
+        radio.read( &got_time, sizeof(unsigned long) );
+        unsigned long end_time = micros();
+        
+        // Spew it
+        Serial.print(F("Sent "));
+        Serial.print(start_time);
+        Serial.print(F(", Got response "));
+        Serial.print(got_time);
+        Serial.print(F(", Round-trip delay "));
+        Serial.print(end_time-start_time);
+        Serial.println(F(" microseconds"));
+    }
+
+    // Try again 1s later
+    delay(1000);
   }
 
-  if(state == sendSensor){
-    radio.stopListening();
-    //build message
-    char sendStr [32];
-    buildSensorMessage(200,300,400,sendStr);
 
-    Serial.printf("Send sensors... msg: %s\n",sendStr);
-    radio.openWritingPipe(writeAddr[0]);
-    radio.write(&sendStr, sizeof(sendStr));
 
-    radio.openWritingPipe(writeAddr[1]);
-    radio.write(&sendStr, sizeof(sendStr));
+/****************** Pong Back Role ***************************/
 
-    state = sendMessage;
-  } else if(state == sendMessage ){
-      Serial.printf("Send message...\n");
-      //build message
-      // char msg [32] = "derp";
-      // radio.write(&msg, sizeof(msg));
-      delay(5);
-      radio.startListening();
-      state = listen;
-  } else if (state == listen){
-
-    // Serial.printf("listening...\n");
-
+  if ( role == 0 )
+  {
+    unsigned long got_time;
+    
     if( radio.available()){
-
-
-      char receiveStr [32] = "";
-                                                              // Variable for the received timestamp
+                                                                    // Variable for the received timestamp
       while (radio.available()) {                                   // While there is data ready
-        radio.read( &receiveStr, sizeof(receiveStr) );                            // Get the payload
+        radio.read( &got_time, sizeof(unsigned long) );             // Get the payload
       }
      
-      Serial.printf("Received a string: %s\n",receiveStr);  
-
-      //TODO: decoden etc, eerst maar eens zien of dit werkt
+      radio.stopListening();                                        // First, stop listening so we can talk   
+      radio.write( &got_time, sizeof(unsigned long) );              // Send the final one back.      
+      radio.startListening();                                       // Now, resume listening so we catch the next packets.     
+      Serial.print(F("Sent response "));
+      Serial.println(got_time);  
    }
+ }
+
+
+
+
+/****************** Change Roles via Serial Commands ***************************/
+
+  if ( Serial.available() )
+  {
+    char c = toupper(Serial.read());
+    if ( c == 'T' && role == 0 ){      
+      Serial.println(F("*** CHANGING TO TRANSMIT ROLE -- PRESS 'R' TO SWITCH BACK"));
+      role = 1;                  // Become the primary transmitter (ping out)
+    
+   }else
+    if ( c == 'R' && role == 1 ){
+      Serial.println(F("*** CHANGING TO RECEIVE ROLE -- PRESS 'T' TO SWITCH BACK"));      
+       role = 0;                // Become the primary receiver (pong back)
+       radio.startListening();
+       
+    }
   }
 
-  timeSeconds = (timeSeconds + 1) % 60; // temporary workaround until RTC is implemented
-  delay(100);
-}
 
-
-
+} // Loop
