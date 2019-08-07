@@ -7,10 +7,10 @@
 #define TTGO_T5_2_4 0
 
 
-#define SCK 0
-#define MISO 0
-#define MOSI 0
-#define SS 0
+#define SCK 14
+#define MISO 2
+#define MOSI 15
+#define SS 13
 
 
 #if (TTGO_T5_1_2) || (TTGO_T5_2_4)

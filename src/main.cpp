@@ -14,13 +14,13 @@
 
 
 
-#define led 12
-
-RF24 radio(22,23); // CE, CSN
+RF24 radio(SCK,MISO,MOSI,22,23); // CE, CSN
 
 
-#define ERIK
-// #define JOOST
+
+
+// #define ERIK
+#define JOOST
 // #define BEREND
 
 
@@ -79,10 +79,14 @@ void setup() {
   // radio.openWritingPipe(writeAddr[0]);
   // radio.openWritingPipe(writeAddr[1]);
 
+  radio.setChannel(2);
+  radio.setPayloadSize(32);
+
+  radio.setDataRate(RF24_250KBPS);
+  radio.setPALevel(RF24_PA_MAX);
 
   radio.openReadingPipe(1, readAddr[0]);
   radio.openReadingPipe(2, readAddr[1]);
-  radio.setPALevel(RF24_PA_MAX);
 }
 
 
@@ -128,7 +132,7 @@ void buildSensorMessage(int temperature,int humidity, int opens, char str[]){
 
 void loop() {
   
-  Serial.printf("time: %d\n",timeSeconds);
+  // Serial.printf("time: %d\n",timeSeconds);
 
   if(timeSeconds == STARTTIME){ //only start when it is exactly the right time
     state = sendSensor;
@@ -139,11 +143,11 @@ void loop() {
 
   if(state == sendSensor){
     radio.stopListening();
-    Serial.printf("Send sensors...\n");
     //build message
     char sendStr [32];
     buildSensorMessage(200,300,400,sendStr);
 
+    Serial.printf("Send sensors... msg: %s\n",sendStr);
     radio.openWritingPipe(writeAddr[0]);
     radio.write(&sendStr, sizeof(sendStr));
 
@@ -161,7 +165,7 @@ void loop() {
       state = listen;
   } else if (state == listen){
 
-    Serial.printf("listening...\n");
+    // Serial.printf("listening...\n");
 
     if( radio.available()){
 
@@ -179,7 +183,7 @@ void loop() {
   }
 
   timeSeconds = (timeSeconds + 1) % 60; // temporary workaround until RTC is implemented
-  delay(1000);
+  delay(100);
 }
 
 
