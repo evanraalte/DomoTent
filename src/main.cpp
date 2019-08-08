@@ -9,10 +9,12 @@
 #include <Fonts/FreeMonoBoldOblique9pt7b.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 #include <Fonts/FreeMonoOblique9pt7b.h>
+
 #include <Fonts/FreeSans9pt7b.h>
 #include <Fonts/FreeSansBold9pt7b.h>
 #include <Fonts/FreeSansBoldOblique9pt7b.h>
 #include <Fonts/FreeSansOblique9pt7b.h>
+
 #include <Fonts/FreeSerif9pt7b.h>
 #include <Fonts/FreeSerifBold9pt7b.h>
 #include <Fonts/FreeSerifBoldItalic9pt7b.h>
@@ -108,7 +110,7 @@ void displayInit(void)
     }
     isInit = true;
     display.init();
-    display.setRotation(1);
+    display.setRotation(2);
     display.eraseDisplay();
     display.setTextColor(GxEPD_BLACK);
     display.setFont(&DEFALUT_FONT);
@@ -345,17 +347,38 @@ void drawBitmap(const char *filename, int16_t x, int16_t y, bool with_color)
 void showMainPage(void)
 {
     displayInit();
-    display.fillScreen(GxEPD_WHITE);;
-    drawBitmap(DEFALUT_QR_CODE_BMP, 10, 10, false);
-    displayText("Reee", 30, RIGHT_ALIGNMENT);
-    displayText("eeee", 50, RIGHT_ALIGNMENT);
-    displayText("eeee", 70, RIGHT_ALIGNMENT);
-    displayText("eeee", 90, RIGHT_ALIGNMENT);
+    display.fillScreen(GxEPD_WHITE);
+    // drawBitmap(DEFALUT_QR_CODE_BMP, 10, 10, false);
     // display.drawExampleBitmap(BitmapExample1, 0, 0, GxEPD_WIDTH, GxEPD_HEIGHT, GxEPD_BLACK);
    
-    display.update();
-    // display.update();
 }
+
+void drawGrid(void) {
+    display.drawFastHLine(0, 174, 250, GxEPD_BLACK);
+    display.drawFastHLine(0, 214, 250, GxEPD_BLACK);
+
+    display.setTextSize(2);
+    displayText("28.4", 25, CENTER_ALIGNMENT);
+    displayText("44.4", 85, CENTER_ALIGNMENT);
+    displayText("28", 145, CENTER_ALIGNMENT);
+
+    display.setTextSize(1);
+    displayText("Temperature", 43, CENTER_ALIGNMENT);
+    displayText("Humidity", 103, CENTER_ALIGNMENT);
+    displayText("Opens", 163, CENTER_ALIGNMENT);
+
+    display.setTextSize(0);
+    displayText("JOOST", 191, LEFT_ALIGNMENT);
+    displayText("28.4", 209, LEFT_ALIGNMENT);
+    displayText("52.8", 209, CENTER_ALIGNMENT);
+    displayText("12", 209, RIGHT_ALIGNMENT);
+
+    displayText("ERIK", 231, LEFT_ALIGNMENT);
+    displayText("28.4", 249, LEFT_ALIGNMENT);
+    displayText("52.8", 249, CENTER_ALIGNMENT);
+    displayText("12", 249, RIGHT_ALIGNMENT);
+}
+
 
 
 void setup()
@@ -373,6 +396,8 @@ void setup()
         }
     }
     showMainPage();
+    drawGrid();
+    display.update();
 }
  
 void loop()
