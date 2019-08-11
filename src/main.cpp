@@ -9,6 +9,17 @@
 #define ESP1
 
 
+union SensorDataUnion {
+  struct SensorData {
+    float temperature;
+    float humidity;
+    int opens;
+  } fields;
+  uint8_t bin[sizeof(fields)];
+};
+
+
+
 // I Am....
 #ifdef ESP1
 uint8_t mac_addr[] = {0xA4, 0xCF, 0x12, 0x75, 0x9A, 0x5C}; //and send to ESP2
@@ -21,15 +32,23 @@ uint8_t mac_addr[] = {0xA4, 0xCF, 0x12, 0x75, 0x3D, 0x7C}; //and send to ESP1
 
 // Function that will send the value to
 // the peer that has the specified mac address
-void send(const uint8_t *value, uint8_t *peerMacAddress) {
-  esp_err_t result = esp_now_send(peerMacAddress, value, sizeof(value));
-  Serial.printf("Send value %d to other esp", *value);
+void send(const union SensorDataUnion *sensData, uint8_t *peerMacAddress) {
+  // Serial.printf("length: %d",sizeof(*sensData));
+  esp_err_t result = esp_now_send(peerMacAddress, sensData->bin, sizeof(*sensData));
+    printf("Send SensorData, size: %d, temp: %f, humidity: %f, opens: %d\n"
+      , sizeof(*sensData)
+      , sensData->fields.temperature
+      , sensData->fields.humidity
+      , sensData->fields.opens);
   // If the submission was not successful
   if (result != ESP_OK) {
     Serial.println("Error sending data");
   }
 
 }
+
+
+
 
 esp_now_peer_info_t peer;
 
@@ -67,12 +86,21 @@ void InitESPNow() {
 }
 
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Success" : "Fail");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? " -> Success" : " -> Fail");
 }
 
-void onDataRecv(const uint8_t *mac_addr, const uint8_t *value, int len) {
-  Serial.print("Received data: ");
-  Serial.println(*value);
+
+void onDataRecv(const uint8_t *mac_addr, const uint8_t *sensData_bin, int len) {
+  union SensorDataUnion sensData = {0,0,0};
+  // memcpy(sensData,sensData_bin,sizeof sensData_bin);
+  // Serial.printf("len: %d",len);
+  memcpy(sensData.bin,sensData_bin,sizeof sensData);
+
+  Serial.printf("Received SensorData, size: %d, temp: %f, humidity: %f, opens: %d\n"
+    , sizeof(sensData)
+    , sensData.fields.temperature
+    , sensData.fields.humidity
+    , sensData.fields.opens);
 }
 
 
@@ -92,11 +120,11 @@ void setup() {
   // #endif
 }
 
-uint8_t val = 0;
+union SensorDataUnion sensData = {22,100,0};
 
 void loop(){
-  send(&val, mac_addr);
-  val++;
+  send(&sensData, mac_addr);
+  sensData.fields.opens++;
   delay(2000);
 }
 
