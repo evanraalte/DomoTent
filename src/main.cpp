@@ -20,19 +20,49 @@ union SensorDataUnion {
   uint8_t bin[sizeof(fields)];
 };
 
+#define ESP1_MAC {0xA4, 0xCF, 0x12, 0x75, 0x3D, 0x7C}
+#define ESP2_MAC {0xA4, 0xCF, 0x12, 0x75, 0x9A, 0x5C}
+
+#define ERIK_MAC {0x00,0x00,0x00,0x00,0x00,0x00,0x00}
+#define JOOST_MAC {0x00,0x00,0x00,0x00,0x00,0x00,0x00}
+#define BEREND_MAC {0x00,0x00,0x00,0x00,0x00,0x00,0x00}
+
+#define NUM_PEERS 2
+
+union SensorDataUnion sensDataJoost;
+union SensorDataUnion sensDataErik;
+union SensorDataUnion sensDataBerend;
 
 
-// I Am....
+// change to Erik
 #ifdef ESP1
-uint8_t mac_addr[] = {0xA4, 0xCF, 0x12, 0x75, 0x9A, 0x5C}; //and send to ESP2
+uint8_t mac_addr [NUM_PEERS][6] =  {
+              ESP2_MAC,  // send to Joost
+              ESP2_MAC   // send to Berend 
+              };
 #define ESP_S  "ESP1"
 #endif
 
+
+// change to Joost
 #ifdef ESP2
-uint8_t mac_addr[] = {0xA4, 0xCF, 0x12, 0x75, 0x3D, 0x7C}; //and send to ESP1
+uint8_t mac_addr[NUM_PEERS][6] = {
+              ESP1_MAC,  //replace with ERIK_MAC
+              ESP1_MAC   //replace with BEREND_MAC
+              };
+
 #define ESP_S  "ESP2"
 #endif
 
+// change to Berend
+#ifdef ESP3
+uint8_t mac_addr[NUM_PEERS][6] = {
+              ESP1_MAC,  //replace with ERIK_MAC
+              ESP1_MAC   //replace with BEREND_MAC
+              };
+
+#define ESP_S  "ESP3"
+#endif
 
 // Function that will send the value to
 // the peer that has the specified mac address
@@ -96,17 +126,31 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 
 
 void onDataRecv(const uint8_t *mac_addr, const uint8_t *sensData_bin, int len) {
-  union SensorDataUnion sensData = {0,0,0};
-  // memcpy(sensData,sensData_bin,sizeof sensData_bin);
-  // Serial.printf("len: %d",len);
+  union SensorDataUnion sensData;
+
+  // copy data into struct
   memcpy(sensData.bin,sensData_bin,sizeof sensData);
 
-    printf("Receive SensorData, size: %d, name: %s, temp: %f, humidity: %f, opens: %d\n"
-      , sizeof(sensData)
-      , sensData.fields.name
-      , sensData.fields.temperature
-      , sensData.fields.humidity
-      , sensData.fields.opens);
+
+  // You should not receive something from yourself
+  if (strcmp(sensData.fields.name,"BEREND")){
+    // put in berend struct (use for drawing later)
+    sensDataBerend = sensData;
+  } else if (strcmp(sensData.fields.name,"Joost")){
+    sensDataJoost = sensData;
+  } else if (strcmp(sensData.fields.name,"ERIK")){ // you should also not receive from yourself :)
+    // put in berend struct (use for drawing later)
+    sensDataErik = sensData;
+  } else {
+    //not good
+  }
+
+  printf("Receive SensorData, size: %d, name: %s, temp: %f, humidity: %f, opens: %d\n"
+    , sizeof(sensData)
+    , sensData.fields.name
+    , sensData.fields.temperature
+    , sensData.fields.humidity
+    , sensData.fields.opens);
 }
 
 
@@ -116,7 +160,8 @@ void setup() {
   modeStation();
   InitESPNow();
 
-  addPeer(mac_addr);
+  for(int i=0; i < NUM_PEERS; i++)
+    addPeer(mac_addr[i]);
   // #ifdef ESP1
   esp_now_register_send_cb(OnDataSent);
   // #endif
@@ -129,8 +174,9 @@ void setup() {
 union SensorDataUnion sensData = {ESP_S,22,100,0};
 
 void loop(){
-  send(&sensData, mac_addr);
+  for(int i=0; i < NUM_PEERS; i++)
+    send(&sensData, mac_addr[i]);
   sensData.fields.opens++;
-  delay(2000);
+  delay(2000); //fuck time frames for now, we can do that if it works ;) 
 }
 
