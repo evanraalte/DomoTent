@@ -6,11 +6,13 @@
 #define CHANNEL 1
 
 // MASTER OR SLAVE
-#define ESP1
+#define ESP2
+
 
 
 union SensorDataUnion {
   struct SensorData {
+    char name[7];
     float temperature;
     float humidity;
     int opens;
@@ -23,10 +25,12 @@ union SensorDataUnion {
 // I Am....
 #ifdef ESP1
 uint8_t mac_addr[] = {0xA4, 0xCF, 0x12, 0x75, 0x9A, 0x5C}; //and send to ESP2
+#define ESP_S  "ESP1"
 #endif
 
 #ifdef ESP2
 uint8_t mac_addr[] = {0xA4, 0xCF, 0x12, 0x75, 0x3D, 0x7C}; //and send to ESP1
+#define ESP_S  "ESP2"
 #endif
 
 
@@ -35,8 +39,9 @@ uint8_t mac_addr[] = {0xA4, 0xCF, 0x12, 0x75, 0x3D, 0x7C}; //and send to ESP1
 void send(const union SensorDataUnion *sensData, uint8_t *peerMacAddress) {
   // Serial.printf("length: %d",sizeof(*sensData));
   esp_err_t result = esp_now_send(peerMacAddress, sensData->bin, sizeof(*sensData));
-    printf("Send SensorData, size: %d, temp: %f, humidity: %f, opens: %d\n"
+  Serial.printf("Send SensorData, size: %d, name: %s, temp: %f, humidity: %f, opens: %d\n"
       , sizeof(*sensData)
+      , sensData->fields.name
       , sensData->fields.temperature
       , sensData->fields.humidity
       , sensData->fields.opens);
@@ -96,11 +101,12 @@ void onDataRecv(const uint8_t *mac_addr, const uint8_t *sensData_bin, int len) {
   // Serial.printf("len: %d",len);
   memcpy(sensData.bin,sensData_bin,sizeof sensData);
 
-  Serial.printf("Received SensorData, size: %d, temp: %f, humidity: %f, opens: %d\n"
-    , sizeof(sensData)
-    , sensData.fields.temperature
-    , sensData.fields.humidity
-    , sensData.fields.opens);
+    printf("Receive SensorData, size: %d, name: %s, temp: %f, humidity: %f, opens: %d\n"
+      , sizeof(sensData)
+      , sensData.fields.name
+      , sensData.fields.temperature
+      , sensData.fields.humidity
+      , sensData.fields.opens);
 }
 
 
@@ -120,7 +126,7 @@ void setup() {
   // #endif
 }
 
-union SensorDataUnion sensData = {22,100,0};
+union SensorDataUnion sensData = {ESP_S,22,100,0};
 
 void loop(){
   send(&sensData, mac_addr);
